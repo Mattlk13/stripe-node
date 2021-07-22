@@ -14,6 +14,7 @@ describe('Payouts Resource', () => {
         url: `/v1/payouts/${PAYOUT_TEST_ID}`,
         headers: {},
         data: {},
+        settings: {},
       });
     });
   });
@@ -29,6 +30,7 @@ describe('Payouts Resource', () => {
         url: '/v1/payouts',
         headers: {},
         data: {amount: 200, currency: 'usd'},
+        settings: {},
       });
     });
   });
@@ -43,6 +45,7 @@ describe('Payouts Resource', () => {
         url: `/v1/payouts/${PAYOUT_TEST_ID}`,
         headers: {},
         data: {metadata: {key: 'value'}},
+        settings: {},
       });
     });
   });
@@ -55,6 +58,7 @@ describe('Payouts Resource', () => {
         url: `/v1/payouts/${PAYOUT_TEST_ID}/cancel`,
         headers: {},
         data: {},
+        settings: {},
       });
     });
   });
@@ -67,6 +71,20 @@ describe('Payouts Resource', () => {
         url: '/v1/payouts',
         headers: {},
         data: {},
+        settings: {},
+      });
+    });
+  });
+
+  describe('reverse', () => {
+    it('Sends the correct request', () => {
+      stripe.payouts.reverse(PAYOUT_TEST_ID);
+      expect(stripe.LAST_REQUEST).to.deep.equal({
+        method: 'POST',
+        url: `/v1/payouts/${PAYOUT_TEST_ID}/reverse`,
+        headers: {},
+        data: {},
+        settings: {},
       });
     });
   });

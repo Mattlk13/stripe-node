@@ -1,7 +1,7 @@
 'use strict';
 
-var stripe = require('../../testUtils').getSpyableStripe();
-var expect = require('chai').expect;
+const stripe = require('../../testUtils').getSpyableStripe();
+const expect = require('chai').expect;
 
 describe('BalanceTransactions Resource', function() {
   describe('retrieve', function() {
@@ -12,6 +12,7 @@ describe('BalanceTransactions Resource', function() {
         url: '/v1/balance_transactions/txn_123',
         headers: {},
         data: {},
+        settings: {},
       });
     });
   });
@@ -24,6 +25,7 @@ describe('BalanceTransactions Resource', function() {
         url: '/v1/balance_transactions',
         headers: {},
         data: {},
+        settings: {},
       });
     });
   });

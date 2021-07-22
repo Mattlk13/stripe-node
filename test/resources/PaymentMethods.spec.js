@@ -12,6 +12,7 @@ describe('PaymentMethods Resource', () => {
         url: '/v1/payment_methods/pm_123',
         headers: {},
         data: {},
+        settings: {},
       });
     });
   });
@@ -27,6 +28,7 @@ describe('PaymentMethods Resource', () => {
         url: '/v1/payment_methods',
         headers: {},
         data,
+        settings: {},
       });
     });
   });
@@ -40,9 +42,10 @@ describe('PaymentMethods Resource', () => {
       stripe.paymentMethods.list(data);
       expect(stripe.LAST_REQUEST).to.deep.equal({
         method: 'GET',
-        url: '/v1/payment_methods',
+        url: '/v1/payment_methods?customer=cus_123&type=card',
         headers: {},
-        data,
+        data: {},
+        settings: {},
       });
     });
   });
@@ -58,6 +61,7 @@ describe('PaymentMethods Resource', () => {
         url: '/v1/payment_methods/pm_123',
         headers: {},
         data,
+        settings: {},
       });
     });
   });
@@ -70,6 +74,7 @@ describe('PaymentMethods Resource', () => {
         url: '/v1/payment_methods/pm_123/attach',
         headers: {},
         data: {customer: 'cus_123'},
+        settings: {},
       });
     });
   });
@@ -82,6 +87,7 @@ describe('PaymentMethods Resource', () => {
         url: '/v1/payment_methods/pm_123/detach',
         headers: {},
         data: {},
+        settings: {},
       });
     });
   });

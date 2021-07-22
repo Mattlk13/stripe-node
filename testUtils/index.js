@@ -6,9 +6,37 @@ require('mocha');
 // Ensure we are using the 'as promised' libs before any tests are run:
 require('chai').use(require('chai-as-promised'));
 
+const http = require('http');
+
 const ResourceNamespace = require('../lib/ResourceNamespace').ResourceNamespace;
 
 const utils = (module.exports = {
+  getTestServerStripe: (clientOptions, handler, callback) => {
+    const server = http.createServer((req, res) => {
+      const {shouldStayOpen} = handler(req, res) || {};
+      if (!shouldStayOpen) {
+        res.on('close', () => {
+          server.close();
+        });
+      }
+    });
+    server.listen(0, () => {
+      const {port} = server.address();
+      const stripe = require('../lib/stripe')(
+        module.exports.getUserStripeKey(),
+        {
+          host: 'localhost',
+          port,
+          protocol: 'http',
+          ...clientOptions,
+        }
+      );
+      return callback(null, stripe, () => {
+        server.close();
+      });
+    });
+  },
+
   getUserStripeKey: () => {
     const key =
       process.env.STRIPE_TEST_API_KEY || 'tGN0bIwXnHdwOa85VABjPdSn8nWY7G7I';
@@ -48,6 +76,7 @@ const utils = (module.exports = {
           url,
           data,
           headers: options.headers || {},
+          settings: options.settings || {},
         });
         if (auth) {
           req.auth = auth;
@@ -55,8 +84,22 @@ const utils = (module.exports = {
         if (host) {
           req.host = host;
         }
-        stripeInstance.REQUESTS.push(req);
-        cb.call(this, null, {});
+
+        const handleMockRequest = (err, req) => {
+          stripeInstance.REQUESTS.push(req);
+          cb.call(this, err, {});
+        };
+
+        if (this.requestDataProcessor) {
+          this.requestDataProcessor(
+            method,
+            data,
+            options.headers,
+            handleMockRequest
+          );
+        } else {
+          handleMockRequest(null, req);
+        }
       };
     }
 

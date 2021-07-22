@@ -12,6 +12,7 @@ describe('Events Resource', () => {
         url: '/v1/events/eventIdBaz',
         headers: {},
         data: {},
+        settings: {},
       });
     });
   });
@@ -21,9 +22,10 @@ describe('Events Resource', () => {
       stripe.events.list({count: 25});
       expect(stripe.LAST_REQUEST).to.deep.equal({
         method: 'GET',
-        url: '/v1/events',
+        url: '/v1/events?count=25',
         headers: {},
-        data: {count: 25},
+        data: {},
+        settings: {},
       });
     });
   });

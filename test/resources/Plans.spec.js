@@ -6,12 +6,13 @@ const expect = require('chai').expect;
 describe('Plans Resource', () => {
   describe('retrieve', () => {
     it('Sends the correct request', () => {
-      stripe.plans.retrieve('planId1');
+      stripe.plans.retrieve('plan_123');
       expect(stripe.LAST_REQUEST).to.deep.equal({
         method: 'GET',
-        url: '/v1/plans/planId1',
+        url: '/v1/plans/plan_123',
         headers: {},
         data: {},
+        settings: {},
       });
     });
   });
@@ -27,6 +28,7 @@ describe('Plans Resource', () => {
         url: '/v1/plans',
         headers: {},
         data: {amount: 200, currency: 'usd'},
+        settings: {},
       });
     });
 
@@ -41,6 +43,7 @@ describe('Plans Resource', () => {
         url: '/v1/plans',
         headers: {},
         data: {amount: 200, currency: 'usd', usage_type: 'metered'},
+        settings: {},
       });
     });
 
@@ -48,7 +51,10 @@ describe('Plans Resource', () => {
       stripe.plans.create({
         currency: 'usd',
         billing_scheme: 'tiered',
-        tiers: [{up_to: 123, amount: 100}, {up_to: 'inf', amount: 200}],
+        tiers: [
+          {up_to: 123, amount: 100},
+          {up_to: 'inf', amount: 200},
+        ],
         tiers_mode: 'volume',
       });
       expect(stripe.LAST_REQUEST).to.deep.equal({
@@ -58,9 +64,13 @@ describe('Plans Resource', () => {
         data: {
           currency: 'usd',
           billing_scheme: 'tiered',
-          tiers: [{up_to: 123, amount: 100}, {up_to: 'inf', amount: 200}],
+          tiers: [
+            {up_to: 123, amount: 100},
+            {up_to: 'inf', amount: 200},
+          ],
           tiers_mode: 'volume',
         },
+        settings: {},
       });
     });
 
@@ -79,33 +89,35 @@ describe('Plans Resource', () => {
           currency: 'usd',
           transform_usage: {divide_by: 123, round: 'up'},
         },
+        settings: {},
       });
     });
   });
 
   describe('update', () => {
     it('Sends the correct request', () => {
-      stripe.plans.update('planId3', {
-        amount: 1900,
-        currency: 'usd',
+      stripe.plans.update('plan_123', {
+        active: false,
       });
       expect(stripe.LAST_REQUEST).to.deep.equal({
         method: 'POST',
-        url: '/v1/plans/planId3',
+        url: '/v1/plans/plan_123',
         headers: {},
-        data: {amount: 1900, currency: 'usd'},
+        data: {active: false},
+        settings: {},
       });
     });
   });
 
   describe('del', () => {
     it('Sends the correct request', () => {
-      stripe.plans.del('planId4');
+      stripe.plans.del('plan_123');
       expect(stripe.LAST_REQUEST).to.deep.equal({
         method: 'DELETE',
-        url: '/v1/plans/planId4',
+        url: '/v1/plans/plan_123',
         headers: {},
         data: {},
+        settings: {},
       });
     });
   });
@@ -118,6 +130,7 @@ describe('Plans Resource', () => {
         url: '/v1/plans',
         headers: {},
         data: {},
+        settings: {},
       });
     });
   });

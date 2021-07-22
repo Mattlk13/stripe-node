@@ -135,13 +135,15 @@ describe('utils', () => {
     it('handles an empty list', () => {
       expect(utils.getDataFromArgs([])).to.deep.equal({});
     });
+
     it('handles a list with no object', () => {
       const args = [1, 3];
       expect(utils.getDataFromArgs(args)).to.deep.equal({});
       expect(args.length).to.equal(2);
     });
+
     it('ignores a hash with only options', (done) => {
-      const args = [{api_key: 'foo'}];
+      const args = [{apiKey: 'foo'}];
 
       handleWarnings(
         () => {
@@ -155,8 +157,9 @@ describe('utils', () => {
         }
       );
     });
+
     it('warns if the hash contains both data and options', (done) => {
-      const args = [{foo: 'bar', api_key: 'foo', idempotency_key: 'baz'}];
+      const args = [{foo: 'bar', apiKey: 'foo', idempotencyKey: 'baz'}];
 
       handleWarnings(
         () => {
@@ -164,7 +167,7 @@ describe('utils', () => {
         },
         (message) => {
           expect(message).to.equal(
-            'Stripe: Options found in arguments (api_key, idempotency_key).' +
+            'Stripe: Options found in arguments (apiKey, idempotencyKey).' +
               ' Did you mean to pass an options object? See https://github.com/stripe/stripe-node/wiki/Passing-Options.'
           );
 
@@ -172,8 +175,9 @@ describe('utils', () => {
         }
       );
     });
+
     it('finds the data', () => {
-      const args = [{foo: 'bar'}, {api_key: 'foo'}];
+      const args = [{foo: 'bar'}, {apiKey: 'foo'}];
       expect(utils.getDataFromArgs(args)).to.deep.equal({foo: 'bar'});
       expect(args.length).to.equal(1);
     });
@@ -184,63 +188,77 @@ describe('utils', () => {
       expect(utils.getOptionsFromArgs([])).to.deep.equal({
         auth: null,
         headers: {},
+        settings: {},
       });
     });
+
     it('handles an list with no object', () => {
       const args = [1, 3];
       expect(utils.getOptionsFromArgs(args)).to.deep.equal({
         auth: null,
         headers: {},
+        settings: {},
       });
       expect(args.length).to.equal(2);
     });
+
     it('ignores a non-options object', () => {
       const args = [{foo: 'bar'}];
       expect(utils.getOptionsFromArgs(args)).to.deep.equal({
         auth: null,
         headers: {},
+        settings: {},
       });
       expect(args.length).to.equal(1);
     });
+
     it('parses an api key', () => {
       const args = ['sk_test_iiiiiiiiiiiiiiiiiiiiiiii'];
       expect(utils.getOptionsFromArgs(args)).to.deep.equal({
         auth: 'sk_test_iiiiiiiiiiiiiiiiiiiiiiii',
         headers: {},
+        settings: {},
       });
       expect(args.length).to.equal(0);
     });
+
     it('assumes any string is an api key', () => {
       const args = ['yolo'];
       expect(utils.getOptionsFromArgs(args)).to.deep.equal({
         auth: 'yolo',
         headers: {},
+        settings: {},
       });
       expect(args.length).to.equal(0);
     });
+
     it('parses an idempotency key', () => {
-      const args = [{foo: 'bar'}, {idempotency_key: 'foo'}];
+      const args = [{foo: 'bar'}, {idempotencyKey: 'foo'}];
       expect(utils.getOptionsFromArgs(args)).to.deep.equal({
         auth: null,
         headers: {'Idempotency-Key': 'foo'},
+        settings: {},
       });
       expect(args.length).to.equal(1);
     });
+
     it('parses an api version', () => {
-      const args = [{foo: 'bar'}, {stripe_version: '2003-03-30'}];
+      const args = [{foo: 'bar'}, {apiVersion: '2003-03-30'}];
       expect(utils.getOptionsFromArgs(args)).to.deep.equal({
         auth: null,
         headers: {'Stripe-Version': '2003-03-30'},
+        settings: {},
       });
       expect(args.length).to.equal(1);
     });
+
     it('parses an idempotency key and api key and api version (with data)', () => {
       const args = [
         {foo: 'bar'},
         {
-          api_key: 'sk_test_iiiiiiiiiiiiiiiiiiiiiiii',
-          idempotency_key: 'foo',
-          stripe_version: '2010-01-10',
+          apiKey: 'sk_test_iiiiiiiiiiiiiiiiiiiiiiii',
+          idempotencyKey: 'foo',
+          apiVersion: '2010-01-10',
         },
       ];
       expect(utils.getOptionsFromArgs(args)).to.deep.equal({
@@ -249,15 +267,17 @@ describe('utils', () => {
           'Idempotency-Key': 'foo',
           'Stripe-Version': '2010-01-10',
         },
+        settings: {},
       });
       expect(args.length).to.equal(1);
     });
+
     it('parses an idempotency key and api key and api version', () => {
       const args = [
         {
-          api_key: 'sk_test_iiiiiiiiiiiiiiiiiiiiiiii',
-          idempotency_key: 'foo',
-          stripe_version: 'hunter2',
+          apiKey: 'sk_test_iiiiiiiiiiiiiiiiiiiiiiii',
+          idempotencyKey: 'foo',
+          apiVersion: 'hunter2',
         },
       ];
       expect(utils.getOptionsFromArgs(args)).to.deep.equal({
@@ -266,16 +286,121 @@ describe('utils', () => {
           'Idempotency-Key': 'foo',
           'Stripe-Version': 'hunter2',
         },
+        settings: {},
       });
       expect(args.length).to.equal(0);
     });
+
+    it('parses additional per-request settings', () => {
+      const args = [
+        {
+          maxNetworkRetries: 5,
+          timeout: 1000,
+        },
+      ];
+
+      expect(utils.getOptionsFromArgs(args)).to.deep.equal({
+        auth: null,
+        headers: {},
+        settings: {
+          maxNetworkRetries: 5,
+          timeout: 1000,
+        },
+      });
+    });
+
+    it('parses snake case for backwards compatibility', () => {
+      return new Promise((resolve, reject) => {
+        const args = [
+          {
+            api_key: 'sk_test_iiiiiiiiiiiiiiiiiiiiiiii',
+            idempotency_key: 'key',
+            stripe_account: 'acct_123',
+            stripe_version: '2019-08-08',
+          },
+        ];
+        const desiredWarnings = [
+          "Stripe: 'api_key' is deprecated; use 'apiKey' instead.",
+          "Stripe: 'idempotency_key' is deprecated; use 'idempotencyKey' instead.",
+          "Stripe: 'stripe_account' is deprecated; use 'stripeAccount' instead.",
+          "Stripe: 'stripe_version' is deprecated; use 'apiVersion' instead.",
+        ];
+
+        const warnings = [];
+        const onWarn = (message) => {
+          warnings.push(message);
+          if (warnings.length === desiredWarnings.length) {
+            expect(warnings).to.deep.equal(desiredWarnings);
+            resolve();
+          }
+        };
+        handleWarnings(() => {
+          expect(utils.getOptionsFromArgs(args)).to.deep.equal({
+            auth: 'sk_test_iiiiiiiiiiiiiiiiiiiiiiii',
+            headers: {
+              'Idempotency-Key': 'key',
+              'Stripe-Version': '2019-08-08',
+              'Stripe-Account': 'acct_123',
+            },
+            settings: {},
+          });
+        }, onWarn);
+      });
+    });
+
+    it('parses stripeVersion for backwards compatibility', () => {
+      return new Promise((resolve, reject) => {
+        const args = [
+          {
+            apiKey: 'sk_test_iiiiiiiiiiiiiiiiiiiiiiii',
+            stripeVersion: '2019-08-08',
+          },
+        ];
+        const desiredWarnings = [
+          "Stripe: 'stripeVersion' is deprecated; use 'apiVersion' instead.",
+        ];
+
+        const warnings = [];
+        const onWarn = (message) => {
+          warnings.push(message);
+          if (warnings.length === desiredWarnings.length) {
+            expect(warnings).to.deep.equal(desiredWarnings);
+            resolve();
+          }
+        };
+        handleWarnings(() => {
+          expect(utils.getOptionsFromArgs(args)).to.deep.equal({
+            auth: 'sk_test_iiiiiiiiiiiiiiiiiiiiiiii',
+            headers: {
+              'Stripe-Version': '2019-08-08',
+            },
+            settings: {},
+          });
+        }, onWarn);
+      });
+    });
+
+    it('errors if you pass both a deprecated and non-deprecated version of the same param', () => {
+      const args = [
+        {
+          stripeVersion: 'bad',
+          apiVersion: 'good',
+        },
+      ];
+      expect(() => {
+        utils.getOptionsFromArgs(args);
+      }).to.throw(
+        "Both 'apiVersion' and 'stripeVersion' were provided; please remove 'stripeVersion', which is deprecated."
+      );
+    });
+
     it('warns if the hash contains something that does not belong', (done) => {
       const args = [
         {foo: 'bar'},
         {
-          api_key: 'sk_test_iiiiiiiiiiiiiiiiiiiiiiii',
-          idempotency_key: 'foo',
-          stripe_version: '2010-01-10',
+          apiKey: 'sk_test_iiiiiiiiiiiiiiiiiiiiiiii',
+          idempotencyKey: 'foo',
+          apiVersion: '2010-01-10',
           fishsticks: true,
           custard: true,
         },
@@ -381,6 +506,22 @@ describe('utils', () => {
       utils.safeExec('hello', myCb);
       expect(calls).to.deep.equal([[myErr, null]]);
     });
+
+    it('handles being unable to require `child_process`', () => {
+      utils._exec = null;
+
+      let actualErr = null;
+      let actualRes = null;
+      function myCb(err, res) {
+        actualErr = err;
+        actualRes = res;
+      }
+      utils.safeExec('hello', myCb);
+      expect(actualErr.toString()).to.equal(
+        new Error('exec not available').toString()
+      );
+      expect(actualRes).to.equal(null);
+    });
   });
 
   describe('flattenAndStringify', () => {
@@ -431,6 +572,41 @@ describe('utils', () => {
       expect(flattened.buf).to.deep.equal(buf);
       expect(flattened).to.have.property('x[a]');
       expect(flattened['x[a]']).to.equal('1');
+    });
+  });
+
+  describe('validateInteger', () => {
+    it("Returns the given value if it's a valid integer", () => {
+      const cases = [1, 0x123, 1e3, Number.MAX_SAFE_INTEGER];
+
+      cases.forEach((int) => {
+        expect(utils.validateInteger('magicNumber', int)).to.equal(int);
+      });
+    });
+
+    it('Throws an error if the value is not an integer', () => {
+      const cases = ['foo', 1.2, Number.POSITIVE_INFINITY];
+
+      cases.forEach((val) => {
+        expect(() => {
+          utils.validateInteger('magicNumber', val);
+        }).to.throw();
+      });
+    });
+
+    it('Returns a default value if n is not provided', () => {
+      const expected = 1000;
+      [null, undefined].forEach((t) => {
+        expect(utils.validateInteger('magicNumber', t, expected)).to.equal(
+          expected
+        );
+      });
+    });
+
+    it('Throws if neither value nor default is set', () => {
+      expect(() => {
+        utils.validateInteger('magicNumber');
+      }).to.throw();
     });
   });
 });

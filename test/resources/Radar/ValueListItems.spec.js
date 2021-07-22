@@ -15,6 +15,7 @@ describe('Radar', () => {
           url: '/v1/radar/value_list_items/rsli_123',
           headers: {},
           data: {},
+          settings: {},
         });
       });
     });
@@ -33,6 +34,7 @@ describe('Radar', () => {
             value_list: 'rsl_123',
             value: 'value',
           },
+          settings: {},
         });
       });
     });
@@ -44,11 +46,10 @@ describe('Radar', () => {
         });
         expect(stripe.LAST_REQUEST).to.deep.equal({
           method: 'GET',
-          url: '/v1/radar/value_list_items',
+          url: '/v1/radar/value_list_items?value_list=rsl_123',
           headers: {},
-          data: {
-            value_list: 'rsl_123',
-          },
+          data: {},
+          settings: {},
         });
       });
     });
@@ -61,6 +62,7 @@ describe('Radar', () => {
           url: '/v1/radar/value_list_items/rsli_123',
           headers: {},
           data: {},
+          settings: {},
         });
       });
     });

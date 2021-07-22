@@ -6,13 +6,15 @@ const expect = require('chai').expect;
 function errorsOnNoStripeVersion() {
   return expect(
     stripe.ephemeralKeys.create({customer: 'cus_123'})
-  ).to.be.eventually.rejectedWith(/stripe_version must be specified/i);
+  ).to.be.eventually.rejectedWith(
+    /Passing apiVersion in a separate options hash is required/i
+  );
 }
 
 function sendsCorrectStripeVersion() {
   stripe.ephemeralKeys.create(
     {customer: 'cus_123'},
-    {stripe_version: '2017-06-05'}
+    {apiVersion: '2017-06-05'}
   );
 
   expect(stripe.LAST_REQUEST).to.deep.equal({
@@ -24,6 +26,7 @@ function sendsCorrectStripeVersion() {
     headers: {
       'Stripe-Version': '2017-06-05',
     },
+    settings: {},
   });
 }
 
@@ -32,7 +35,7 @@ describe('EphemeralKey Resource', () => {
     it('Sends the correct request', () => {
       stripe.ephemeralKeys.create(
         {customer: 'cus_123'},
-        {stripe_version: '2017-05-25'}
+        {apiVersion: '2017-05-25'}
       );
       expect(stripe.LAST_REQUEST).to.deep.equal({
         method: 'POST',
@@ -43,6 +46,7 @@ describe('EphemeralKey Resource', () => {
         headers: {
           'Stripe-Version': '2017-05-25',
         },
+        settings: {},
       });
     });
 
@@ -91,6 +95,7 @@ describe('EphemeralKey Resource', () => {
         url: '/v1/ephemeral_keys/ephkey_123',
         data: {},
         headers: {},
+        settings: {},
       });
     });
   });

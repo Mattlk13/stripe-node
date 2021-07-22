@@ -12,6 +12,7 @@ describe('CreditNotes Resource', () => {
         url: '/v1/credit_notes/cn_123',
         headers: {},
         data: {},
+        settings: {},
       });
     });
   });
@@ -29,6 +30,7 @@ describe('CreditNotes Resource', () => {
         url: '/v1/credit_notes',
         headers: {},
         data,
+        settings: {},
       });
     });
   });
@@ -38,9 +40,36 @@ describe('CreditNotes Resource', () => {
       stripe.creditNotes.list({count: 25});
       expect(stripe.LAST_REQUEST).to.deep.equal({
         method: 'GET',
-        url: '/v1/credit_notes',
+        url: '/v1/credit_notes?count=25',
         headers: {},
-        data: {count: 25},
+        data: {},
+        settings: {},
+      });
+    });
+  });
+
+  describe('listLineItems', () => {
+    it('Sends the correct request', () => {
+      stripe.creditNotes.listLineItems('cn_123');
+      expect(stripe.LAST_REQUEST).to.deep.equal({
+        method: 'GET',
+        url: '/v1/credit_notes/cn_123/lines',
+        headers: {},
+        data: {},
+        settings: {},
+      });
+    });
+  });
+
+  describe('listPreviewLineItems', () => {
+    it('Sends the correct request', () => {
+      stripe.creditNotes.listPreviewLineItems();
+      expect(stripe.LAST_REQUEST).to.deep.equal({
+        method: 'GET',
+        url: '/v1/credit_notes/preview/lines',
+        headers: {},
+        data: {},
+        settings: {},
       });
     });
   });
@@ -53,6 +82,24 @@ describe('CreditNotes Resource', () => {
         url: '/v1/credit_notes/cn_123',
         headers: {},
         data: {application_fee: 200},
+        settings: {},
+      });
+    });
+  });
+
+  describe('preview', () => {
+    it('Sends the correct request', () => {
+      const data = {
+        amount: 100,
+        invoice: 'in_123',
+      };
+      stripe.creditNotes.preview(data);
+      expect(stripe.LAST_REQUEST).to.deep.equal({
+        method: 'GET',
+        url: '/v1/credit_notes/preview?amount=100&invoice=in_123',
+        headers: {},
+        data: {},
+        settings: {},
       });
     });
   });
@@ -65,6 +112,7 @@ describe('CreditNotes Resource', () => {
         url: '/v1/credit_notes/cn_123/void',
         headers: {},
         data: {},
+        settings: {},
       });
     });
   });

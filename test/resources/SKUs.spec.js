@@ -12,6 +12,7 @@ describe('SKU Resource', () => {
         url: '/v1/skus/skuIdFoo123',
         data: {},
         headers: {},
+        settings: {},
       });
     });
   });
@@ -36,6 +37,7 @@ describe('SKU Resource', () => {
           product: 'prodIdTest123',
         },
         headers: {},
+        settings: {},
       });
     });
   });
@@ -47,11 +49,10 @@ describe('SKU Resource', () => {
       });
       expect(stripe.LAST_REQUEST).to.deep.equal({
         method: 'GET',
-        url: '/v1/skus',
-        data: {
-          limit: 3,
-        },
+        url: '/v1/skus?limit=3',
+        data: {},
         headers: {},
+        settings: {},
       });
     });
 
@@ -61,11 +62,10 @@ describe('SKU Resource', () => {
       });
       expect(stripe.LAST_REQUEST).to.deep.equal({
         method: 'GET',
-        url: '/v1/skus',
-        data: {
-          product: 'prodId123',
-        },
+        url: '/v1/skus?product=prodId123',
+        data: {},
         headers: {},
+        settings: {},
       });
     });
   });
@@ -78,6 +78,7 @@ describe('SKU Resource', () => {
         url: '/v1/skus/skuIdFoo3242',
         headers: {},
         data: {caption: 'test'},
+        settings: {},
       });
     });
   });
@@ -90,6 +91,7 @@ describe('SKU Resource', () => {
         url: '/v1/skus/skuIdFoo3242',
         headers: {},
         data: {},
+        settings: {},
       });
     });
   });

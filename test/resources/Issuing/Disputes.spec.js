@@ -15,6 +15,7 @@ describe('Issuing', () => {
           url: '/v1/issuing/disputes/idp_123',
           headers: {},
           data: {},
+          settings: {},
         });
       });
     });
@@ -31,6 +32,7 @@ describe('Issuing', () => {
           data: {
             transaction: 'ipi_123',
           },
+          settings: {},
         });
       });
     });
@@ -53,6 +55,7 @@ describe('Issuing', () => {
               thing2: 'yes',
             },
           },
+          settings: {},
         });
       });
     });
@@ -65,6 +68,30 @@ describe('Issuing', () => {
           url: '/v1/issuing/disputes',
           headers: {},
           data: {},
+          settings: {},
+        });
+      });
+    });
+
+    describe('submit', () => {
+      it('Sends the correct request', () => {
+        stripe.issuing.disputes.submit('idp_123', {
+          metadata: {
+            thing1: true,
+            thing2: 'yes',
+          },
+        });
+        expect(stripe.LAST_REQUEST).to.deep.equal({
+          method: 'POST',
+          url: '/v1/issuing/disputes/idp_123/submit',
+          headers: {},
+          data: {
+            metadata: {
+              thing1: true,
+              thing2: 'yes',
+            },
+          },
+          settings: {},
         });
       });
     });

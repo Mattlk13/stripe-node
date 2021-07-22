@@ -14,6 +14,7 @@ describe('Customers Resource', () => {
         url: '/v1/customers/cus_123',
         headers: {},
         data: {},
+        settings: {},
       });
     });
 
@@ -25,6 +26,7 @@ describe('Customers Resource', () => {
         headers: {},
         data: {},
         auth: TEST_AUTH_KEY,
+        settings: {},
       });
     });
   });
@@ -37,6 +39,7 @@ describe('Customers Resource', () => {
         url: '/v1/customers',
         headers: {},
         data: {description: 'Some customer'},
+        settings: {},
       });
     });
 
@@ -48,6 +51,7 @@ describe('Customers Resource', () => {
         headers: {},
         data: {description: 'Some customer'},
         auth: TEST_AUTH_KEY,
+        settings: {},
       });
     });
 
@@ -59,26 +63,28 @@ describe('Customers Resource', () => {
         headers: {},
         data: {},
         auth: TEST_AUTH_KEY,
+        settings: {},
       });
     });
 
-    it('Sends the correct request [with specified idempotency_key in options]', () => {
+    it('Sends the correct request [with specified idempotencyKey in options]', () => {
       stripe.customers.create(
         {description: 'Some customer'},
-        {idempotency_key: 'foo'}
+        {idempotencyKey: 'foo'}
       );
       expect(stripe.LAST_REQUEST).to.deep.equal({
         method: 'POST',
         url: '/v1/customers',
         headers: {'Idempotency-Key': 'foo'},
         data: {description: 'Some customer'},
+        settings: {},
       });
     });
 
     it('Sends the correct request [with specified auth in options]', () => {
       stripe.customers.create(
         {description: 'Some customer'},
-        {api_key: TEST_AUTH_KEY}
+        {apiKey: TEST_AUTH_KEY}
       );
       expect(stripe.LAST_REQUEST).to.deep.equal({
         method: 'POST',
@@ -86,13 +92,14 @@ describe('Customers Resource', () => {
         headers: {},
         data: {description: 'Some customer'},
         auth: TEST_AUTH_KEY,
+        settings: {},
       });
     });
 
     it('Sends the correct request [with specified auth and idempotent key in options]', () => {
       stripe.customers.create(
         {description: 'Some customer'},
-        {api_key: TEST_AUTH_KEY, idempotency_key: 'foo'}
+        {apiKey: TEST_AUTH_KEY, idempotencyKey: 'foo'}
       );
       expect(stripe.LAST_REQUEST).to.deep.equal({
         method: 'POST',
@@ -100,17 +107,19 @@ describe('Customers Resource', () => {
         headers: {'Idempotency-Key': 'foo'},
         data: {description: 'Some customer'},
         auth: TEST_AUTH_KEY,
+        settings: {},
       });
     });
 
     it('Sends the correct request [with specified auth in options and no body]', () => {
-      stripe.customers.create({api_key: TEST_AUTH_KEY});
+      stripe.customers.create({apiKey: TEST_AUTH_KEY});
       expect(stripe.LAST_REQUEST).to.deep.equal({
         method: 'POST',
         url: '/v1/customers',
         headers: {},
         data: {},
         auth: TEST_AUTH_KEY,
+        settings: {},
       });
     });
   });
@@ -125,6 +134,7 @@ describe('Customers Resource', () => {
         url: '/v1/customers/cus_123',
         headers: {},
         data: {description: 'Foo "baz"'},
+        settings: {},
       });
     });
   });
@@ -137,6 +147,7 @@ describe('Customers Resource', () => {
         url: '/v1/customers/cus_123',
         headers: {},
         data: {},
+        settings: {},
       });
     });
   });
@@ -149,6 +160,7 @@ describe('Customers Resource', () => {
         url: '/v1/customers',
         headers: {},
         data: {},
+        settings: {},
       });
     });
 
@@ -160,6 +172,7 @@ describe('Customers Resource', () => {
         headers: {},
         data: {},
         auth: TEST_AUTH_KEY,
+        settings: {},
       });
     });
   });
@@ -173,6 +186,7 @@ describe('Customers Resource', () => {
           url: '/v1/customers/cus_123/discount',
           headers: {},
           data: {},
+          settings: {},
         });
       });
     });
@@ -187,6 +201,7 @@ describe('Customers Resource', () => {
           url: '/v1/customers/cus_123/sources/card_123',
           headers: {},
           data: {},
+          settings: {},
         });
       });
 
@@ -198,41 +213,48 @@ describe('Customers Resource', () => {
           headers: {},
           data: {},
           auth: TEST_AUTH_KEY,
+          settings: {},
         });
       });
     });
 
     describe('createSource', () => {
       it('Sends the correct request', () => {
-        stripe.customers.createSource('cus_123', {
-          object: 'card',
-          number: '123456',
-          exp_month: '12',
-        });
+        const params = {
+          source: {
+            object: 'card',
+            number: '123456',
+            exp_month: '12',
+            exp_year: '30',
+          },
+        };
+        stripe.customers.createSource('cus_123', params);
         expect(stripe.LAST_REQUEST).to.deep.equal({
           method: 'POST',
           url: '/v1/customers/cus_123/sources',
           headers: {},
-          data: {object: 'card', number: '123456', exp_month: '12'},
+          data: params,
+          settings: {},
         });
       });
 
       it('Sends the correct request [with specified auth]', () => {
-        stripe.customers.createSource(
-          'cus_123',
-          {
+        const params = {
+          source: {
             object: 'card',
             number: '123456',
             exp_month: '12',
+            exp_year: '30',
           },
-          TEST_AUTH_KEY
-        );
+        };
+        stripe.customers.createSource('cus_123', params, TEST_AUTH_KEY);
         expect(stripe.LAST_REQUEST).to.deep.equal({
           method: 'POST',
           url: '/v1/customers/cus_123/sources',
           headers: {},
-          data: {object: 'card', number: '123456', exp_month: '12'},
+          data: params,
           auth: TEST_AUTH_KEY,
+          settings: {},
         });
       });
     });
@@ -247,6 +269,7 @@ describe('Customers Resource', () => {
           url: '/v1/customers/cus_123/sources/card_123',
           headers: {},
           data: {name: 'Bob M. Baz'},
+          settings: {},
         });
       });
     });
@@ -259,6 +282,7 @@ describe('Customers Resource', () => {
           url: '/v1/customers/cus_123/sources/card_123',
           headers: {},
           data: {},
+          settings: {},
         });
       });
 
@@ -270,6 +294,7 @@ describe('Customers Resource', () => {
           headers: {},
           data: {},
           auth: TEST_AUTH_KEY,
+          settings: {},
         });
       });
     });
@@ -282,6 +307,7 @@ describe('Customers Resource', () => {
           url: '/v1/customers/cus_123/sources',
           headers: {},
           data: {},
+          settings: {},
         });
       });
 
@@ -293,6 +319,7 @@ describe('Customers Resource', () => {
           headers: {},
           data: {},
           auth: TEST_AUTH_KEY,
+          settings: {},
         });
       });
     });
@@ -313,6 +340,7 @@ describe('Customers Resource', () => {
           headers: {},
           data,
           auth: TEST_AUTH_KEY,
+          settings: {},
         });
       });
     });
@@ -327,6 +355,7 @@ describe('Customers Resource', () => {
           url: '/v1/customers/cus_123/tax_ids/txi_123',
           headers: {},
           data: {},
+          settings: {},
         });
       });
     });
@@ -342,6 +371,7 @@ describe('Customers Resource', () => {
           method: 'POST',
           url: '/v1/customers/cus_123/tax_ids',
           headers: {},
+          settings: {},
           data,
         });
       });
@@ -355,6 +385,7 @@ describe('Customers Resource', () => {
           url: '/v1/customers/cus_123/tax_ids/txi_123',
           headers: {},
           data: {},
+          settings: {},
         });
       });
     });
@@ -367,6 +398,7 @@ describe('Customers Resource', () => {
           url: '/v1/customers/cus_123/tax_ids',
           headers: {},
           data: {},
+          settings: {},
         });
       });
     });
@@ -381,6 +413,7 @@ describe('Customers Resource', () => {
           url: '/v1/customers/cus_123/balance_transactions/cbtxn_123',
           headers: {},
           data: {},
+          settings: {},
         });
       });
     });
@@ -396,6 +429,7 @@ describe('Customers Resource', () => {
           url: '/v1/customers/cus_123/balance_transactions',
           headers: {},
           data: {amount: 123, currency: 'usd'},
+          settings: {},
         });
       });
     });
@@ -410,6 +444,7 @@ describe('Customers Resource', () => {
           url: '/v1/customers/cus_123/balance_transactions/cbtxn_123',
           headers: {},
           data: {description: 'description'},
+          settings: {},
         });
       });
     });
@@ -422,6 +457,7 @@ describe('Customers Resource', () => {
           url: '/v1/customers/cus_123/balance_transactions',
           headers: {},
           data: {},
+          settings: {},
         });
       });
     });

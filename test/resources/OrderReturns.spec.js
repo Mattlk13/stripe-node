@@ -12,6 +12,7 @@ describe('OrderReturn Resource', () => {
         url: '/v1/order_returns/orderReturnIdFoo123',
         data: {},
         headers: {},
+        settings: {},
       });
     });
   });
@@ -23,11 +24,10 @@ describe('OrderReturn Resource', () => {
       });
       expect(stripe.LAST_REQUEST).to.deep.equal({
         method: 'GET',
-        url: '/v1/order_returns',
-        data: {
-          limit: 3,
-        },
+        url: '/v1/order_returns?limit=3',
+        data: {},
         headers: {},
+        settings: {},
       });
     });
 
@@ -37,11 +37,10 @@ describe('OrderReturn Resource', () => {
       });
       expect(stripe.LAST_REQUEST).to.deep.equal({
         method: 'GET',
-        url: '/v1/order_returns',
-        data: {
-          order: 'orderIdFoo123',
-        },
+        url: '/v1/order_returns?order=orderIdFoo123',
         headers: {},
+        data: {},
+        settings: {},
       });
     });
   });
